@@ -1,0 +1,11 @@
+groups:
+  - name: observability-app-alerts
+    rules:
+      - alert: ObservabilityAppDown
+        expr: up{service="observability-app"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Observability application is down
+          description: Prometheus cannot scrape the observability application.

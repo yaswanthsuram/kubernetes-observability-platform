@@ -1,0 +1,38 @@
+name: Validate Project
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r app/requirements.txt
+
+      - name: Validate Python syntax
+        run: python -m py_compile app/app.py
+
+      - name: Validate Kubernetes YAML
+        run: |
+          python - <<'PY'
+          import pathlib
+          import yaml
+
+          for file in pathlib.Path("kubernetes").glob("*.yaml"):
+              with open(file) as f:
+                  list(yaml.safe_load_all(f))
+              print(f"Validated {file}")
+          PY
